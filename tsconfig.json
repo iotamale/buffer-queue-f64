@@ -8,8 +8,9 @@
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
 		"declaration": true,
-		"rootDir": ".",
+		"rootDir": "./src",
 		"outDir": "./dist"
 	},
-	"include": ["src", "test"]
+	"include": ["src"],
+	"exclude": ["test", "bench", "**/*.test.ts"]
 }
