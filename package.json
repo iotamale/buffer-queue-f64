@@ -1,5 +1,5 @@
 {
-	"name": "flat-queue-f64",
+	"name": "buffer-queue-f64",
 	"version": "1.0.0",
 	"description": "Float64Array ring buffer queue",
 	"main": "./dist/index.js",
@@ -10,13 +10,18 @@
 	],
 	"scripts": {
 		"build": "tsup && tsc --emitDeclarationOnly",
-		"test": "vitest run"
+		"test": "vitest run",
+		"prepublishOnly": "npm run test && npm run build"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/iotamale/flat-queue-f64.git"
+		"url": "git+https://github.com/iotamale/buffer-queue-f64.git"
 	},
-	"keywords": [],
+	"keywords": [
+		"queue",
+		"ring-buffer",
+		"float64array"
+	],
 	"author": "Kacper Jaworski",
 	"license": "MIT",
 	"devDependencies": {
