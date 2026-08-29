@@ -9,7 +9,7 @@ export class Float64RingQueue {
 	 * @param initialCapacity Inital capacity, 1000 by default.
 	 */
 	constructor(initialCapacity: number = 1000) {
-		this.capacity = 1 << initialCapacity;
+		this.capacity = initialCapacity;
 		this.buffer = new Float64Array(this.capacity);
 	}
 
