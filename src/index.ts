@@ -6,13 +6,21 @@ export class Float64RingQueue {
 	private currSize: number = 0;
 
 	/**
-	 * @param initialCapacity Inital capacity, 1000 by default.
+	 * Creates a new dynamically resizing ring buffer queue.
+	 *
+	 * @param initialCapacity Initial size of the buffer (1000 by default).
 	 */
 	constructor(initialCapacity: number = 1000) {
 		this.capacity = initialCapacity;
 		this.buffer = new Float64Array(this.capacity);
 	}
 
+	/**
+	 * Pushes a new number to the tail of the queue.
+	 * If the buffer is full, it dynamically doubles its capacity.
+	 *
+	 * @param value The number to be added to the queue.
+	 */
 	public add(value: number): void {
 		if (this.currSize === this.capacity) {
 			this.resize();
@@ -24,6 +32,11 @@ export class Float64RingQueue {
 		this.currSize++;
 	}
 
+	/**
+	 * Removes and returns the oldest number from the head of the queue.
+	 *
+	 * @returns The removed number, or `undefined` if the queue is empty.
+	 */
 	public poll(): number | undefined {
 		if (this.currSize === 0) {
 			return undefined;
@@ -37,10 +50,20 @@ export class Float64RingQueue {
 		return value;
 	}
 
+	/**
+	 * Retrieves the current number of elements stored in the queue.
+	 *
+	 * @returns The number of elements in the queue.
+	 */
 	public size(): number {
 		return this.currSize;
 	}
 
+	/**
+	 * Checks whether the queue is empty.
+	 *
+	 * @returns `true` if the queue contains no elements, `false` otherwise.
+	 */
 	public isEmpty(): boolean {
 		return this.currSize === 0;
 	}
