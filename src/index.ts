@@ -91,12 +91,18 @@ export class Float64RingQueue {
 		this.currSize = 0;
 	}
 
+	/**
+	 * Doubles the buffer capacity and realigns the elements to start from index 0.
+	 * Uses native memory block copying to maximise performance.
+	 */
 	private resize(): void {
 		const newCapacity = this.capacity * 2;
 		const newBuffer = new Float64Array(newCapacity);
 
-		for (let i = 0; i < this.currSize; i++) {
-			newBuffer[i] = this.buffer[(this.head + i) % this.capacity];
+		newBuffer.set(this.buffer.subarray(this.head, this.capacity), 0);
+
+		if (this.head > 0) {
+			newBuffer.set(this.buffer.subarray(0, this.head), this.capacity - this.head);
 		}
 
 		this.buffer = newBuffer;

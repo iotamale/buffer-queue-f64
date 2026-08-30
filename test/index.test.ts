@@ -34,6 +34,30 @@ describe('Float64RingQueue', () => {
 		expect(queue.poll()).toBe(5);
 	});
 
+	it('should correctly resize when buffer pointers are wrapped around', () => {
+		const queue = new Float64RingQueue(4);
+
+		queue.add(1);
+		queue.add(2);
+		queue.add(3);
+		queue.poll();
+		queue.poll();
+
+		queue.add(4);
+		queue.add(5);
+		queue.add(6);
+
+		queue.add(7); // triggers resize; this.head > 0 condition is met
+
+		expect(queue.size()).toBe(5);
+		expect(queue.poll()).toBe(3);
+		expect(queue.poll()).toBe(4);
+		expect(queue.poll()).toBe(5);
+		expect(queue.poll()).toBe(6);
+		expect(queue.poll()).toBe(7);
+		expect(queue.isEmpty()).toBe(true);
+	});
+
 	it('should return undefined when empty', () => {
 		const queue = new Float64RingQueue();
 		expect(queue.poll()).toBeUndefined();
