@@ -18,9 +18,9 @@
 		"url": "git+https://github.com/iotamale/buffer-queue-f64.git"
 	},
 	"bugs": {
-		"url": "https://github.com/TwojNick/buffer-queue-f64/issues"
+		"url": "https://github.com/iotamale/buffer-queue-f64/issues"
 	},
-	"homepage": "https://github.com/TwojNick/buffer-queue-f64#readme",
+	"homepage": "https://github.com/iotamale/buffer-queue-f64#readme",
 	"keywords": [
 		"queue",
 		"ring-buffer",
