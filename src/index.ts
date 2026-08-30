@@ -51,6 +51,19 @@ export class Float64RingQueue {
 	}
 
 	/**
+	 * Retrieves the oldest number from the head of the queue without removing it.
+	 *
+	 * @returns The number at the head of the queue, or `undefined` if the queue is empty.
+	 */
+	public peek(): number | undefined {
+		if (this.currSize === 0) {
+			return undefined;
+		}
+
+		return this.buffer[this.head];
+	}
+
+	/**
 	 * Retrieves the current number of elements stored in the queue.
 	 *
 	 * @returns The number of elements in the queue.
@@ -66,6 +79,16 @@ export class Float64RingQueue {
 	 */
 	public isEmpty(): boolean {
 		return this.currSize === 0;
+	}
+
+	/**
+	 * Clears all elements from the queue by resetting the internal pointers.
+	 * This keeps the underlying memory buffer intact, completely avoiding Garbage Collection overhead during reuse.
+	 */
+	public clear(): void {
+		this.head = 0;
+		this.tail = 0;
+		this.currSize = 0;
 	}
 
 	private resize(): void {
