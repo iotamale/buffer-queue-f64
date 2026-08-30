@@ -111,4 +111,23 @@ export class Float64RingQueue {
 		this.head = 0;
 		this.tail = this.currSize;
 	}
+
+	/**
+	 * Makes the queue iterable.
+	 * Allows using `for...of` loops and the spread operator `[...queue]`.
+	 * Iterates from the oldest (head) to the newest (tail) element without modifying the queue.
+	 */
+	public *[Symbol.iterator](): IterableIterator<number> {
+		let current = this.head;
+
+		for (let i = 0; i < this.currSize; i++) {
+			yield this.buffer[current];
+
+			current++;
+
+			if (current === this.capacity) {
+				current = 0;
+			}
+		}
+	}
 }

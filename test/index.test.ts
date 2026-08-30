@@ -98,4 +98,32 @@ describe('Float64RingQueue', () => {
 
 		expect(queue.size()).toBe(0);
 	});
+
+	it('should be iterable using for...of and spread operator', () => {
+		const queue = new Float64RingQueue(4);
+
+		queue.add(1.5);
+		queue.add(2.5);
+		queue.add(3.5);
+
+		// spread operator
+		expect([...queue]).toEqual([1.5, 2.5, 3.5]);
+
+		// for ... of
+		const result: number[] = [];
+		for (const val of queue) {
+			result.push(val);
+		}
+		expect(result).toEqual([1.5, 2.5, 3.5]);
+
+		// wrap-around
+		queue.poll();
+		queue.add(4.5);
+		queue.add(5.5);
+
+		expect([...queue]).toEqual([2.5, 3.5, 4.5, 5.5]);
+
+		// iterator does NOT modify the queue
+		expect(queue.size()).toBe(4);
+	});
 });
