@@ -11,6 +11,7 @@
 	"scripts": {
 		"build": "tsup && tsc --emitDeclarationOnly",
 		"test": "vitest run",
+		"coverage": "vitest run --coverage --coverage.reporter=text",
 		"prepublishOnly": "npm run test && npm run build"
 	},
 	"repository": {
@@ -29,6 +30,7 @@
 	"author": "Kacper Jaworski",
 	"license": "MIT",
 	"devDependencies": {
+		"@vitest/coverage-v8": "^4.1.11",
 		"tsup": "^8.5.1",
 		"typescript": "^7.0.2",
 		"vitest": "^4.1.11"
