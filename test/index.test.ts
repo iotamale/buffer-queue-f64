@@ -126,4 +126,48 @@ describe('Float64RingQueue', () => {
 		// iterator does NOT modify the queue
 		expect(queue.size()).toBe(4);
 	});
+
+	it('should correctly handle initial capacities', () => {
+		// rounding up
+		const queue1 = new Float64RingQueue(1000);
+		const queue2 = new Float64RingQueue(1024);
+
+		queue1.add(1);
+		expect(queue1.size()).toBe(1);
+
+		expect(queue1.getCapacity()).toBe(1024);
+		expect(queue2.getCapacity()).toBe(1024);
+
+		// initialCapacity <= 0
+		const queue3 = new Float64RingQueue(0);
+		const queue4 = new Float64RingQueue(-1);
+
+		expect(queue3.getCapacity()).toBe(1);
+		expect(queue4.getCapacity()).toBe(1);
+
+		queue3.add(1);
+		expect(queue3.size()).toBe(1);
+
+		queue3.add(2);
+		expect(queue3.size()).toBe(2);
+		expect(queue3.poll()).toBe(1);
+		expect(queue3.poll()).toBe(2);
+	});
+
+	it('should reset counters when tail exceeds MAX_SAFE_INTEGER', () => {
+		const queue = new Float64RingQueue(4);
+
+		(queue as any).head = Number.MAX_SAFE_INTEGER - 1;
+		(queue as any).tail = Number.MAX_SAFE_INTEGER - 1;
+
+		queue.add(1); // tail := MAX_SAFE_INTEGER
+		queue.add(2); // tail := MAX_SAFE_INTEGER + 1
+		queue.add(3); // resetCounters() is called
+
+		expect((queue as any).head).toBe(0);
+		expect((queue as any).tail).toBe(3);
+		expect(queue.size()).toBe(3);
+
+		expect([...queue]).toEqual([1, 2, 3]);
+	});
 });
