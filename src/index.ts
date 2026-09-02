@@ -3,16 +3,22 @@ export class Float64RingQueue {
 	private head: number = 0;
 	private tail: number = 0;
 	private capacity: number;
-	private currSize: number = 0;
+	private mask: number;
 
 	/**
 	 * Creates a new dynamically resizing ring buffer queue.
+	 * The capacity is always rounded up to the nearest power of 2 to
+	 * allow bitwise masking.
 	 *
-	 * @param initialCapacity Initial size of the buffer (1000 by default).
+	 * @param initialCapacity Initial size of the buffer (1024 by default).
 	 */
-	constructor(initialCapacity: number = 1000) {
-		this.capacity = initialCapacity;
+	constructor(initialCapacity: number = 1024) {
+		const safeCapacity = Math.max(1, initialCapacity);
+		const nearestPowerOf2 = Math.pow(2, Math.ceil(Math.log2(safeCapacity)));
+		this.capacity = nearestPowerOf2;
+
 		this.buffer = new Float64Array(this.capacity);
+		this.mask = this.capacity - 1;
 	}
 
 	/**
@@ -22,14 +28,16 @@ export class Float64RingQueue {
 	 * @param value The number to be added to the queue.
 	 */
 	public add(value: number): void {
-		if (this.currSize === this.capacity) {
+		if (this.tail - this.head === this.capacity) {
 			this.resize();
 		}
 
-		this.buffer[this.tail] = value;
-		this.tail = (this.tail + 1) % this.capacity;
+		if (this.tail > Number.MAX_SAFE_INTEGER) {
+			this.resetCounters();
+		}
 
-		this.currSize++;
+		this.buffer[this.tail & this.mask] = value;
+		this.tail++;
 	}
 
 	/**
@@ -38,14 +46,18 @@ export class Float64RingQueue {
 	 * @returns The removed number, or `undefined` if the queue is empty.
 	 */
 	public poll(): number | undefined {
-		if (this.currSize === 0) {
+		if (this.head === this.tail) {
 			return undefined;
 		}
 
-		const value = this.buffer[this.head];
-		this.head = (this.head + 1) % this.capacity;
+		const value = this.buffer[this.head & this.mask];
+		this.head++;
 
-		this.currSize--;
+		// Reset ptrs to 0 when empty.
+		if (this.head === this.tail) {
+			this.head = 0;
+			this.tail = 0;
+		}
 
 		return value;
 	}
@@ -56,11 +68,11 @@ export class Float64RingQueue {
 	 * @returns The number at the head of the queue, or `undefined` if the queue is empty.
 	 */
 	public peek(): number | undefined {
-		if (this.currSize === 0) {
+		if (this.head === this.tail) {
 			return undefined;
 		}
 
-		return this.buffer[this.head];
+		return this.buffer[this.head & this.mask];
 	}
 
 	/**
@@ -69,7 +81,7 @@ export class Float64RingQueue {
 	 * @returns The number of elements in the queue.
 	 */
 	public size(): number {
-		return this.currSize;
+		return this.tail - this.head;
 	}
 
 	/**
@@ -78,7 +90,16 @@ export class Float64RingQueue {
 	 * @returns `true` if the queue contains no elements, `false` otherwise.
 	 */
 	public isEmpty(): boolean {
-		return this.currSize === 0;
+		return this.head === this.tail;
+	}
+
+	/**
+	 * Retrieves the current allocated capacity of the queue.
+	 *
+	 * @returns The total capacity of the buffer.
+	 */
+	public getCapacity(): number {
+		return this.capacity;
 	}
 
 	/**
@@ -88,7 +109,6 @@ export class Float64RingQueue {
 	public clear(): void {
 		this.head = 0;
 		this.tail = 0;
-		this.currSize = 0;
 	}
 
 	/**
@@ -99,17 +119,32 @@ export class Float64RingQueue {
 		const newCapacity = this.capacity * 2;
 		const newBuffer = new Float64Array(newCapacity);
 
-		newBuffer.set(this.buffer.subarray(this.head, this.capacity), 0);
-
-		if (this.head > 0) {
-			newBuffer.set(this.buffer.subarray(0, this.head), this.capacity - this.head);
-		}
+		const physicalHead = this.head & this.mask;
+		newBuffer.set(this.buffer.subarray(physicalHead), 0);
+		newBuffer.set(this.buffer.subarray(0, physicalHead), this.capacity - physicalHead);
 
 		this.buffer = newBuffer;
 		this.capacity = newCapacity;
+		this.mask = newCapacity - 1;
 
+		this.tail = this.tail - this.head;
 		this.head = 0;
-		this.tail = this.currSize;
+	}
+
+	/**
+	 * Flattens the buffer and resets pointers to 0 to prevent int overflow.
+	 */
+	private resetCounters(): void {
+		const currentSize = this.tail - this.head;
+		const newBuffer = new Float64Array(this.capacity);
+
+		for (let i = 0; i < currentSize; i++) {
+			newBuffer[i] = this.buffer[(this.head + i) & this.mask];
+		}
+
+		this.buffer = newBuffer;
+		this.head = 0;
+		this.tail = currentSize;
 	}
 
 	/**
@@ -118,16 +153,8 @@ export class Float64RingQueue {
 	 * Iterates from the oldest (head) to the newest (tail) element without modifying the queue.
 	 */
 	public *[Symbol.iterator](): IterableIterator<number> {
-		let current = this.head;
-
-		for (let i = 0; i < this.currSize; i++) {
-			yield this.buffer[current];
-
-			current++;
-
-			if (current === this.capacity) {
-				current = 0;
-			}
+		for (let i = this.head; i < this.tail; i++) {
+			yield this.buffer[i & this.mask];
 		}
 	}
 }
