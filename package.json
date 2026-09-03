@@ -1,7 +1,7 @@
 {
 	"name": "buffer-queue-f64",
 	"version": "1.1.1",
-	"description": "Float64Array ring buffer queue",
+	"description": "Extremely fast Float64Array ring buffer queue for high-performance JS/TS applications.",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
@@ -25,8 +25,16 @@
 	"homepage": "https://github.com/iotamale/buffer-queue-f64#readme",
 	"keywords": [
 		"queue",
+		"buffer",
 		"ring-buffer",
-		"float64array"
+		"circular-buffer",
+		"float64array",
+		"typed-array",
+		"fast-queue",
+		"fifo",
+		"data-structures",
+		"zero-gc",
+		"performance"
 	],
 	"author": "Kacper Jaworski",
 	"license": "MIT",
