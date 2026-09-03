@@ -105,3 +105,11 @@ console.log(queue.isEmpty()); // true
 | `getCapacity(): number`                          | Retrieves the current allocated capacity of the queue.                                                                                                 |
 | `clear(): void`                                  | Clears the queue by resetting internal pointers, completely avoiding Garbage Collection overhead.                                                      |
 | `[Symbol.iterator](): IterableIterator<number>`  | Makes the queue iterable. Allows using `for...of` loops and the spread operator (`[...queue]`).                                                        |
+
+## Changelog
+
+See the [CHANGELOG.md](./CHANGELOG.md) for a detailed history of updates, optimizations, and bug fixes.
+
+## License
+
+MIT © Kacper Jaworski
