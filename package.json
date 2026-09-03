@@ -12,7 +12,8 @@
 		"build": "tsup && tsc --emitDeclarationOnly",
 		"test": "vitest run",
 		"coverage": "vitest run --coverage --coverage.reporter=text",
-		"prepublishOnly": "npm run test && npm run build"
+		"prepublishOnly": "npm run test && npm run build",
+		"bench": "tsx bench/index.ts"
 	},
 	"repository": {
 		"type": "git",
@@ -31,8 +32,12 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@vitest/coverage-v8": "^4.1.11",
+		"denque": "^2.1.0",
+		"mitata": "^1.0.34",
 		"tsup": "^8.5.1",
+		"tsx": "^4.23.13",
 		"typescript": "^7.0.2",
-		"vitest": "^4.1.11"
+		"vitest": "^4.1.11",
+		"yocto-queue": "^1.2.2"
 	}
 }

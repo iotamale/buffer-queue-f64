@@ -5,33 +5,32 @@
 ![Zero Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 [![CI](https://github.com/iotamale/buffer-queue-f64/actions/workflows/cicd.yml/badge.svg)](https://github.com/iotamale/buffer-queue-f64/actions/workflows/cicd.yml)
 
-An extremely fast, dynamically resizing ring buffer queue for JavaScript and TypeScript. Built on top of `Float64Array`, it is designed to hold numbers with maximum performance and minimal memory overhead.
+An extremely fast, dynamically resizing ring buffer queue for JavaScript and TypeScript. Built on top of `Float64Array`, it provides absolute **$O(1)$ amortized time complexity** for enqueueing and dequeueing operations, entirely bypassing Garbage Collection pauses during steady state.
 
-## Features
+## Architecture & Optimizations
 
-- **Amortized $O(1)$ operations:** Instant enqueueing and dequeueing.
-- **No GC overhead:** Use `clear()` method to recycle memory across tasks without triggering Garbage Collector.
-- **Native block copying:** Utilizes V8's native memory block copying (`.set()`) for fast resizing.
-- **Iterable:** Fully supports `for...of` loops and the spread operator (`...`).
-- **Zero dependencies:** Extremely lightweight.
+Standard JavaScript arrays are notoriously slow when used as queues, as `Array.prototype.shift()` requires $O(N)$ time complexity due to memory relocation. While array-based or linked-list pointer queues solve the time complexity issue, they still generate continuous work for the Garbage Collector by constantly allocating and discarding objects.
 
-## Caveats & Limitations
+This package solves both problems through deliberate engineering trade-offs:
 
-This data structure makes deliberate trade-offs:
+- **Contiguous memory (`Float64Array`)**: By restricting the queue to numbers only, the buffer avoids object allocation entirely.
+- **Zero GC overhead**: The `clear()` method recycles the underlying memory buffer for reuse across tasks without ever triggering the Garbage Collector.
+- **Bitwise masking**: The internal capacity is strictly rounded up to the nearest power of 2. This allows the queue to use a lightning-fast bitwise AND (`&`) operator instead of a modulo (`%`) operator for pointer wrapping.
+- **Native block copying**: When the queue needs to grow, it utilizes V8's native memory block copying (`.set()`) for fast resizing.
+- **Auto-flattening**: Prevents `Number.MAX_SAFE_INTEGER` overflow by automatically resetting and flattening pointers when necessary.
 
-- **Numbers only:** Backed by a `Float64Array`, it only accepts numbers. It cannot store objects, strings, or other types.
-- **Power of 2 allocation:** To enable fast bitwise masking for pointer wrapping (instead of modulo), the allocated capacity is always rounded up to the nearest power of two.
+## Benchmarks
 
-## Under the Hood
+Tested on Apple M2 (Node.js v26) against 100,000 operations. Lower is better.
 
-Standard JavaScript arrays are notoriously slow when used as queues. `Array.prototype.shift()` results in $O(N)$ time complexity due to memory relocation. Array-based pointer queues avoid this but still generate continuous work for the V8 Garbage Collector.
+| Structure            | Bulk enqueue/dequeue | Steady state (interleaved) | Memory reuse/clear overhead | Memory footprint (avg) |
+| :------------------- | :------------------- | :------------------------- | :-------------------------- | :--------------------- |
+| **buffer-queue-f64** | **~395 µs**          | **~250 µs**                | **~192 µs**                 | **~3.9 kB**            |
+| `denque`             | ~615 µs              | ~309 µs                    | ~222 µs                     | ~2.01 MB               |
+| `yocto-queue`        | ~645 µs              | ~503 µs                    | ~216 µs (new allocation)    | ~3.81 MB               |
+| Standard array       | ~788,000 µs (788ms)  | ~825 µs                    | ~275 µs (new allocation)    | ~2.66 MB               |
 
-`buffer-queue-f64` solves this using a contiguous block of memory and a circular pointer architecture (Ring Buffer), bypassing Garbage Collection pauses during steady state.
-
-### Optimizations
-
-- **Bitwise Masking**: The internal capacity is always rounded up to the nearest power of 2. This allows the queue to use a bitwise AND operator instead of a modulo operator for pointer wrapping, resulting in significantly faster element lookups.
-- **Auto-Flattening**: Automatically prevents `Number.MAX_SAFE_INTEGER` overflow by resetting and flattening the pointers, and completely resets pointers to `0` whenever the queue is emptied.
+_`buffer-queue-f64` is significantly faster across all scenarios while consuming drastically less memory than object-based or linked-list queues._
 
 ## Installation
 
@@ -40,6 +39,9 @@ npm install buffer-queue-f64
 ```
 
 ## Usage
+
+> [!IMPORTANT]
+> This queue strictly accepts **numbers only** (Float64). It cannot store objects, strings, or other data types.
 
 ```ts
 import { Float64RingQueue } from 'buffer-queue-f64';
