@@ -13,7 +13,7 @@ Standard JavaScript arrays are notoriously slow when used as queues, as `Array.p
 
 This package solves both problems through deliberate engineering trade-offs:
 
-- **Contiguous memory (`Float64Array`)**: By restricting the queue to <u>numbers only</u>, the buffer avoids object allocation entirely.
+- **Contiguous memory (`Float64Array`)**: By restricting the queue to numbers only, the buffer avoids object allocation entirely.
 - **Zero GC overhead**: The `clear()` method recycles the underlying memory buffer for reuse across tasks without ever triggering the Garbage Collector.
 - **Bitwise masking**: The internal capacity is strictly rounded up to the nearest power of 2. This allows the queue to use a lightning-fast bitwise AND (`&`) operator instead of a modulo (`%`) operator for pointer wrapping.
 - **Native block copying**: When the queue needs to grow, it utilizes V8's native memory block copying (`.set()`) for fast resizing.
@@ -39,6 +39,9 @@ npm install buffer-queue-f64
 ```
 
 ## Usage
+
+> [!IMPORTANT]
+> This queue strictly accepts **numbers only** (Float64). It cannot store objects, strings, or other data types.
 
 ```ts
 import { Float64RingQueue } from 'buffer-queue-f64';
