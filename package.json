@@ -39,13 +39,13 @@
 	"author": "Kacper Jaworski",
 	"license": "MIT",
 	"devDependencies": {
-		"@vitest/coverage-v8": "^4.1.11",
+		"@vitest/coverage-v8": "^5.0.0",
 		"denque": "^2.1.0",
 		"mitata": "^1.0.34",
 		"tsup": "^8.5.1",
 		"tsx": "^4.23.13",
 		"typescript": "^7.0.2",
-		"vitest": "^4.1.11",
+		"vitest": "^5.0.0",
 		"yocto-queue": "^1.2.2"
 	}
 }
