@@ -42,7 +42,7 @@
 		"@vitest/coverage-v8": "^5.0.0",
 		"denque": "^2.1.0",
 		"mitata": "^1.0.34",
-		"tsup": "^8.5.1",
+		"tsup": "^9.0.0",
 		"tsx": "^4.23.13",
 		"typescript": "^7.0.2",
 		"vitest": "^5.0.0",
